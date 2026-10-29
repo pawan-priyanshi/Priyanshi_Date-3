@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Date 3 — A Little Sorry Gift 🎁</title>
+<style>
+:root{--blue:#8ecbff;--blue-d:#4a9ee0;--pink:#ffc2d6;--pink-d:#ff7aa8;--cream:#fff8ec;--white:#fff;--ink:#4a4466;--shadow:0 10px 30px rgba(74,158,224,.22)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,#dff1ff 0%,#fff8ec 50%,#ffe3ee 100%);overflow-x:hidden}
+.hand{font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive}
+#bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.float{position:absolute;bottom:-40px;animation:rise linear forwards;opacity:.8}
+@keyframes rise{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+#progress{position:fixed;top:0;left:0;right:0;z-index:20;text-align:center;font-size:.85rem;padding:8px;background:rgba(255,255,255,.7);backdrop-filter:blur(6px);color:var(--blue-d);display:none}
+#bar{height:4px;background:var(--pink-d);width:0;transition:width .5s;position:absolute;bottom:0;left:0;border-radius:4px}
+.screen{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:56px 16px 40px;z-index:1;opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
+.screen.active{display:flex}.screen.show{opacity:1;transform:none}
+.wrap{width:100%;max-width:760px;margin:auto;text-align:center}
+.card{background:var(--white);border-radius:28px;padding:28px 24px;box-shadow:var(--shadow);border:3px dashed var(--pink);position:relative}
+h1{font-size:clamp(1.6rem,5vw,2.5rem);line-height:1.2;color:var(--blue-d);margin-bottom:10px}
+h2{font-size:clamp(1.3rem,4vw,1.9rem);color:var(--pink-d);margin-bottom:12px}
+p.sub{font-size:1.05rem;margin-bottom:18px}
+.btn{font:inherit;font-weight:700;font-size:1.05rem;border:0;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--pink-d),#ff9ec0);padding:14px 26px;border-radius:999px;box-shadow:0 6px 0 #e0618c,0 12px 20px rgba(255,122,168,.35);transition:transform .15s,box-shadow .15s;margin:8px 6px}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #e0618c}
+.btn.blue{background:linear-gradient(135deg,var(--blue-d),var(--blue));box-shadow:0 6px 0 #2f7fc0,0 12px 20px rgba(74,158,224,.3)}
+.btn:disabled{opacity:.6;cursor:default}
+.bounce{animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px)}}
+/* gift box */
+#gift{position:relative;width:170px;height:170px;margin:20px auto 26px;cursor:pointer}
+#gift .base{position:absolute;bottom:0;left:10px;width:150px;height:110px;background:var(--blue);border-radius:12px;box-shadow:inset 0 -10px 0 rgba(0,0,0,.07)}
+#gift .vr{position:absolute;bottom:0;left:73px;width:24px;height:110px;background:var(--pink-d)}
+#gift .lid{position:absolute;top:34px;left:0;width:170px;height:36px;background:#6fb8f5;border-radius:12px;transition:transform .8s cubic-bezier(.5,-.6,.5,1.4),opacity .8s;z-index:2}
+#gift .lid::after{content:"";position:absolute;left:73px;top:0;width:24px;height:100%;background:var(--pink-d)}
+#gift .bow{position:absolute;top:-4px;left:50px;font-size:3.2rem;z-index:3;transition:transform .8s,opacity .8s;line-height:1}
+#gift.open .lid{transform:translate(40px,-110px) rotate(25deg);opacity:0}
+#gift.open .bow{transform:translate(-30px,-120px) rotate(-30deg);opacity:0}
+#gift .inside{position:absolute;top:30px;left:55px;font-size:3rem;opacity:0;transition:all .8s .3s;z-index:1}
+#gift.open .inside{opacity:1;transform:translateY(-70px) scale(1.3)}
+/* letter */
+.letter{text-align:left;background:var(--cream);border-radius:20px;padding:22px;min-height:260px;line-height:1.65;font-size:1.05rem;white-space:pre-wrap;border:2px solid #ffe0ea;background-image:repeating-linear-gradient(transparent,transparent 28px,rgba(142,203,255,.2) 29px)}
+.caret::after{content:"▌";color:var(--pink-d);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+.note{font-size:.8rem;color:#9a94b5;margin-top:8px}
+/* ticket */
+.ticket{display:flex;max-width:520px;margin:20px auto;background:var(--white);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;text-align:left;border:2px solid var(--blue)}
+.ticket .l{background:var(--blue);color:#fff;writing-mode:vertical-rl;transform:rotate(180deg);padding:14px 10px;font-weight:800;letter-spacing:3px;text-align:center}
+.ticket .r{padding:16px 18px;border-left:3px dotted var(--pink-d);line-height:1.7}
+.big{font-size:4rem}
+/* stops */
+.stop{background:var(--white);border-radius:24px;padding:20px;margin:18px 0;box-shadow:var(--shadow);text-align:left;display:flex;gap:16px;align-items:center;border-left:8px solid var(--pink-d)}
+.stop:nth-child(even){border-left-color:var(--blue)}
+.stop .ic{font-size:3rem;min-width:70px;text-align:center}
+.stop h3{color:var(--blue-d);margin-bottom:6px}.stop p{margin:4px 0;line-height:1.5}
+.tag{display:inline-block;background:#fff0f5;color:var(--pink-d);padding:2px 12px;border-radius:99px;font-size:.8rem;font-weight:700;margin-bottom:6px}
+.claw{position:relative;height:70px;width:90px;overflow:hidden}
+.claw .arm{position:absolute;left:38px;top:-4px;width:4px;height:30px;background:#999;animation:drop 3s ease-in-out infinite}
+.claw .arm::after{content:"🪝";position:absolute;left:-10px;top:22px;font-size:1.4rem}
+@keyframes drop{50%{transform:translateY(16px)}}
+.claw span{position:absolute;bottom:0;font-size:1.5rem;animation:bob 2s ease-in-out infinite}
+.pop{animation:pop .6s}
+@keyframes pop{50%{transform:scale(1.04) rotate(-1deg)}}
+.mini{display:inline-block;font-size:1.2rem;animation:bob 1.5s infinite}
+.hint{background:#fffbe0;border:2px dashed #ffd96b;border-radius:14px;padding:10px;margin-top:10px;font-size:.9rem}
+/* polaroid */
+.polaroid{background:#fff;padding:14px 14px 50px;width:min(300px,80vw);margin:26px auto;transform:rotate(-4deg);box-shadow:0 14px 30px rgba(0,0,0,.18);position:relative;transition:transform .4s}
+.polaroid:hover{transform:rotate(0)}
+.polaroid .ph{width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,#dff1ff,#ffe3ee);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--ink);font-weight:700}
+.polaroid img{width:100%;height:100%;object-fit:cover;display:block}
+.polaroid .tape{position:absolute;top:-14px;left:50%;width:90px;height:26px;background:rgba(255,194,214,.8);transform:translateX(-50%) rotate(3deg)}
+.sticker{position:absolute;font-size:2rem;animation:bob 2.5s infinite}
+/* player */
+.player{max-width:480px;margin:18px auto 0;background:var(--cream);border-radius:22px;padding:18px}
+.wave{display:flex;gap:4px;height:46px;align-items:center;justify-content:center;margin:6px 0 12px}
+.wave i{width:6px;height:10px;background:var(--pink-d);border-radius:4px;transition:height .2s}
+.playing .wave i{animation:eq .8s ease-in-out infinite}
+.wave i:nth-child(3n){background:var(--blue-d)}
+@keyframes eq{50%{height:44px}}
+.wave i:nth-child(2n){animation-delay:.2s!important}.wave i:nth-child(3n){animation-delay:.4s!important}.wave i:nth-child(5n){animation-delay:.1s!important}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0}
+.row input[type=range]{flex:1;accent-color:var(--pink-d)}
+.circ{width:60px;height:60px;border-radius:50%;border:0;font-size:1.6rem;cursor:pointer;background:var(--pink-d);color:#fff;box-shadow:0 5px 0 #e0618c}
+.time{font-size:.85rem;min-width:40px}
+#audioMsg{color:#d9534f;font-size:.9rem;margin-top:6px;display:none}
+/* heartfelt */
+#s6{background:radial-gradient(circle at 50% 20%,#ffe3ee,#ffc2d6)}
+.soft{background:rgba(255,255,255,.75);border-radius:26px;padding:26px;text-align:left;line-height:1.7;white-space:pre-wrap;box-shadow:var(--shadow)}
+/* invitation */
+.invite{background:linear-gradient(135deg,var(--blue),#b9e0ff);border-radius:26px;padding:26px 20px;color:#fff;box-shadow:var(--shadow);position:relative;border:4px solid #fff;outline:3px dashed var(--pink-d)}
+.invite h1{color:#fff}
+.fields{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.field{background:#fff;color:var(--ink);border-radius:16px;padding:10px 18px;min-width:150px}
+.field b{display:block;color:var(--pink-d);font-size:.8rem}
+.q{font-size:1.4rem;font-weight:800;margin:14px 0;text-shadow:0 2px 0 rgba(0,0,0,.1)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.conf{position:absolute;top:-20px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.list p{font-size:1.15rem;margin:8px 0}
+@media(max-width:560px){.stop{flex-direction:column;text-align:center}.card{padding:20px 14px}.ticket .l{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="bg"></div><div id="confetti"></div>
+<div id="progress"><span id="ptext"></span><div id="bar"></div></div>
+
+<!-- 1 GIFT -->
+<section class="screen" id="s0"><div class="wrap">
+  <h1 class="hand">Psst, Priyanshi... 🎀</h1>
+  <p class="sub">I have something for you.</p>
+  <div id="gift" class="bounce"><div class="inside">💌</div><div class="base"></div><div class="vr"></div><div class="lid"></div><div class="bow">🎀</div></div>
+  <button class="btn" id="openGift">Open your little gift 🎁</button>
+</div></section>
+
+<!-- 2 APOLOGY -->
+<section class="screen" id="s1"><div class="wrap"><div class="card">
+  <h2 class="hand">From me to you 🥺❤️</h2>
+  <div class="letter hand" id="letter"></div>
+  <p class="note" id="skipNote">(tap the letter to skip the typing)</p>
+  <button class="btn" id="toReveal" style="display:none">Okay, show me my gift 🥺</button>
+</div></div></section>
+
+<!-- 3 REVEAL -->
+<section class="screen" id="s2"><div class="wrap">
+  <div class="big bounce">🧸🎁</div>
+  <h1>DATE 3 — THE SORRY GIFT EDITION 🎁</h1>
+  <p class="sub">One little apology. One big day. A million little memories waiting to happen.</p>
+  <div class="ticket"><div class="l">DATE 3</div><div class="r">
+    <b style="color:var(--blue-d)">A day made just for us</b><br>
+    🎬 Movie date + 🧸 Teddy Picker + 🍔 food + us<br>
+    🎁 A special sorry gift from me to you ❤️<br>
+    <small class="hand">📅 <span class="dd"></span> · 🕒 <span class="dt"></span></small>
+  </div></div>
+  <button class="btn" data-next>Show me our plan 🎬</button>
+</div></section>
+
+<!-- 4 PLAN -->
+<section class="screen" id="s3"><div class="wrap">
+  <h1 class="hand">Our little adventure 🧸🍿</h1>
+  <p class="sub">📅 <span class="dd"></span> · 🕒 <span class="dt"></span></p>
+  <div class="stop" id="movieStop"><div class="ic">🎟️</div><div><span class="tag">STOP 1</span><h3>MOVIE TIME 🎬</h3>
+    <p>We're watching Doraemon together! And guess what? This is the first time I'm sponsoring our movie. 🥹❤️</p>
+    <p><button class="btn blue" id="celebrate" style="font-size:.9rem;padding:8px 18px">Celebrate! 🎉</button></p></div></div>
+  <div class="stop"><div class="ic"><div class="claw"><div class="arm"></div><span style="left:6px">🧸</span><span style="left:34px;animation-delay:.5s">🐻</span><span style="left:60px;animation-delay:1s">🧸</span></div></div>
+    <div><span class="tag">STOP 2</span><h3>TEDDY PICKER 🧸</h3><p>Our mission: get the cutest teddy possible!</p><p>Will we win? Who knows. Will we become unnecessarily competitive? Absolutely. 😭</p></div></div>
+  <div class="stop"><div class="ic">🍕🍟</div><div><span class="tag">STOP 3</span><h3>EAT EVERYTHING</h3><p>Today's rule: if it looks yummy, we consider eating it.</p><p>We're going to eat a LOT. No judging each other's food choices. Okay, maybe a little. 😂❤️</p></div></div>
+  <div class="stop"><div class="ic">🌸</div><div><span class="tag">STOP 4</span><h3>ROAM AROUND GT</h3><p>Just walking around, exploring things, talking nonsense, laughing, and enjoying being together.</p><p>Sometimes the best part of a date isn't even the plan. It's just having you beside me.</p></div></div>
+  <div class="stop"><div class="ic">🍔❤️</div><div><span class="tag">STOP 5</span><h3>MCDONALD'S</h3><p>Of course McDonald's has to be included. You didn't think I'd forget, did you?</p><p>More food, more talking, more memories.</p></div></div>
+  <div class="stop"><div class="ic">🏡💗</div><div><span class="tag">STOP 6</span><h3>BACK HOME, BUT STILL US</h3><p>And then we head home, hopefully with happy hearts, full stomachs and a few new memories to keep.</p>
+    <div class="hint">Also... we have an exam the next day. So let's enjoy ourselves AND remember that we're students. 😭📚</div></div></div>
+  <button class="btn" data-next>See our memory 📸</button>
+</div></section>
+
+<!-- 5 PHOTO -->
+<section class="screen" id="s4"><div class="wrap">
+  <h1 class="hand">One little memory 📸❤️</h1>
+  <div class="polaroid">
+    <div class="tape"></div>
+    <span class="sticker" style="top:-24px;left:-22px">🧸</span><span class="sticker" style="top:-20px;right:-20px;animation-delay:.6s">💗</span><span class="sticker" style="bottom:50px;left:-26px;animation-delay:1s">✨</span><span class="sticker" style="bottom:48px;right:-24px;animation-delay:1.4s">🎀</span>
+    <div class="ph" id="photoBox"><span>Our photo goes here 📸</span></div>
+    <div class="hand" style="position:absolute;bottom:14px;left:0;right:0;font-size:.95rem"><b>One picture. A thousand feelings. ❤️</b></div>
+  </div>
+  <p class="sub">A little memory of us, before we make another one.</p>
+  <button class="btn" data-next>Play our song 🎧</button>
+</div></section>
+
+<!-- 6 SONG -->
+<section class="screen" id="s5"><div class="wrap"><div class="card">
+  <div class="big">🎧</div>
+  <h2 class="hand">A little song for my favourite person 🎶</h2>
+  <p class="sub">Because some feelings are easier to share with a song.</p>
+  <div class="player" id="player">
+    <div class="wave" id="wave"></div>
+    <div class="row"><button class="circ" id="playBtn" aria-label="Play or pause">▶</button>
+      <span class="time" id="cur">0:00</span><input type="range" id="seek" min="0" max="100" value="0" step="0.1" aria-label="Progress"><span class="time" id="dur">0:00</span></div>
+    <div class="row">🔈<input type="range" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">🔊</div>
+    <div id="audioMsg">Oops, the song couldn't load 🥺 Check that the file exists at the AUDIO_PATH.</div>
+  </div>
+  <audio id="audio" preload="none"></audio>
+  <button class="btn" data-next style="margin-top:18px">One more thing... 💌</button>
+</div></div></section>
+
+<!-- 7 HEARTFELT -->
+<section class="screen" id="s6"><div class="wrap">
+  <h1 class="hand" style="color:var(--pink-d)">Priyanshi, one little thing...</h1>
+  <div class="soft" id="heartText"></div>
+  <button class="btn" data-next>Keep reading 🧜🏻‍♀️</button>
+</div></section>
+
+<!-- 8 PROMISE -->
+<section class="screen" id="s7"><div class="wrap"><div class="card">
+  <h2 class="hand">My promise to my mermaid 🧜🏻‍♀️🌊❤️</h2>
+  <div class="letter hand" id="promiseText" style="min-height:0"></div>
+  <button class="btn" data-next>I'm ready for the question 🎁</button>
+</div></div></section>
+
+<!-- 9 INVITE -->
+<section class="screen" id="s8"><div class="wrap"><div class="invite">
+  <div class="big bounce">🎁</div>
+  <h1>A little sorry gift, just for you. 🎀</h1>
+  <p class="sub">One movie. One Teddy Picker mission. A LOT of food. A little GT roaming. McDonald's. And a whole day of making memories together.</p>
+  <div class="fields"><div class="field"><b>DATE</b><span class="dd"></span></div><div class="field"><b>TIME</b><span class="dt"></span></div></div>
+  <div class="q">Will you come on Date 3 with me, Priyanshi? 🥺❤️</div>
+  <button class="btn" data-yes>YES, LET'S GO! 🎁❤️</button>
+  <button class="btn blue" data-yes>Obviously, Pookie 🧸</button>
+</div></div></section>
+
+<!-- 10 CONFIRM -->
+<section class="screen" id="s9"><div class="wrap"><div class="card">
+  <div class="big bounce">🧸💗🐻</div>
+  <h1>DATE 3 — OUR SORRY GIFT DATE 💗</h1>
+  <div class="list hand">
+    <p>Movie tickets? Almost ready. 🎬</p><p>Teddy Picker mission? ON. 🧸</p><p>Food plans? ABSOLUTELY. 🍔</p><p>GT roaming? LET'S GO. 🌸</p><p>McDonald's? OBVIOUSLY. 🍟</p><p>One person I want beside me? YOU. ❤️</p>
+  </div>
+  <p class="sub hand" style="margin-top:18px;line-height:1.7">Thank you for being you, Priyanshi.<br><br>This is my little sorry gift for you.<br><br>Let's make another beautiful memory together.<br><br>I love you. ❤️🐻</p>
+  <button class="btn blue" id="replay">Replay our little gift 🎁</button>
+</div></div></section>
+
+<script>
+/* ===== EDIT ME ===== */
+const DATE3_DATE = "25 October 2026";
+const DATE3_TIME = "9:00 AM";
+const PHOTO_PATH = "photo.jpg";
+const AUDIO_PATH = "song.mp3";
+
+const LETTER_TEXT = `Hey, Pookie. ❤️
+
+First of all, I'm sorry for what happened the other day.
+
+I know that sometimes things don't go the way we want them to, and I don't want one bad moment to overshadow all the beautiful moments we share.
+
+You mean so much to me, Priyanshi. You make me feel special in ways I don't always know how to explain. Being around you, talking to you, laughing with you and just spending time with you means more to me than you probably realise.
+
+I love you. And I never want to lose you.
+
+I'm not trying to fix everything with a gift or pretend that a sorry makes everything disappear. I just want to make you smile, make some new memories with you, and remind you how special you are to me.
+
+So, I planned a little day for us.
+
+A little movie, a little Teddy Picker chaos, a LOT of food, some roaming around GT, McDonald's, and most importantly... YOU AND ME. ❤️
+
+This is my little sorry gift for you.
+
+You don't have to be anything other than yourself with me. I just want us to keep talking, understanding each other and making things better together.
+
+Love you, Priyanshi. Always. 🧸❤️`;
+
+const HEART_TEXT = `I know a gift can't magically fix everything. But I hope this day reminds you that you're loved, valued and special to me.
+
+I want to make you smile. I want to laugh with you until our stomachs hurt. I want to play Teddy Picker with you, watch our movie, eat all the food we can manage, roam around GT and make memories that are ours.
+
+And beyond all of that, I want us to keep talking, keep understanding each other and keep choosing to work through things together.
+
+You matter to me. What we have matters to me.
+
+This is my little sorry gift for you. Not because I expect anything in return, but because I love you and I want to make you happy.
+
+I love you, Pookie. 🧸❤️`;
+
+const PROMISE_TEXT = `Hey, my mermaid. 🥹❤️
+
+There's something I really want you to know.
+
+I promise you that Bhavya, Nayan, or anything from my past will not be allowed to disturb the life we're trying to build together.
+
+Because, you know what? The pond for my mermaid is getting ready. 🌊🧜🏻‍♀️ And I'm putting my heart into making it a beautiful, peaceful place where you can feel loved, safe, and special.
+
+I cannot afford to let unnecessary stones or obstacles ruin that pond. I don't want my past to become a reason for you to feel disturbed, insecure, or hurt. I know that when something disturbs me, it can end up disturbing you too, and I don't want us to keep going through that.
+
+I promise to handle my past responsibly, communicate honestly with you, and protect the peace we're trying to build together. I know promises matter only when actions follow them, and I want to show you that you really are my priority.
+
+I want to give you the love, reassurance, time and understanding you deserve. I want you to see it in the way I treat you, the way I listen to you, and the way I choose to handle things. I don't expect you to trust every word immediately. I want to earn that trust, little by little, through my actions.
+
+You mean so much to me, Priyanshi. I love you a lot, and I genuinely want to make things better for us. ❤️
+
+So, my mermaid, will you come on Date 3 with me? 🧸🎬
+
+Will you give me a chance to say sorry properly, to make you smile, and to start showing you the changes I want to make?
+
+I can't change my past, but I can take responsibility for it and choose how I move forward. And I want to move forward with honesty, with care, and with you — if that's what you want too.
+
+Let me make you smile, let me show you how much you matter to me, and let me work towards making our little pond a beautiful place for my mermaid. 🌊🧜🏻‍♀️❤️
+
+With all my love,
+Your person. 🥹❤️`;
+/* ===== END EDIT ZONE ===== */
+
+const $ = id => document.getElementById(id);
+const TOTAL = 9;
+let current = -1, locked = false, typer = null;
+
+// fill editable content
+document.querySelectorAll('.dd').forEach(e => e.textContent = DATE3_DATE);
+document.querySelectorAll('.dt').forEach(e => e.textContent = DATE3_TIME);
+$('heartText').textContent = HEART_TEXT;
+$('promiseText').textContent = PROMISE_TEXT;
+
+// photo with fallback
+(function(){
+  const img = new Image();
+  img.alt = "Our photo";
+  img.onload = () => { $('photoBox').innerHTML = ''; $('photoBox').appendChild(img); };
+  img.onerror = () => { /* keep placeholder */ };
+  img.src = PHOTO_PATH;
+})();
+
+// navigation
+function go(n){
+  if (locked || n === current) return;
+  locked = true;
+  const old = current >= 0 ? $('s' + current) : null;
+  const next = $('s' + n);
+  if (old) old.classList.remove('show');
+  setTimeout(() => {
+    if (old) old.classList.remove('active');
+    next.classList.add('active'); next.scrollTop = 0;
+    requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('show')));
+    current = n;
+    const p = $('progress');
+    if (n === 0) p.style.display = 'none';
+    else {
+      p.style.display = 'block';
+      $('ptext').textContent = n <= TOTAL - 1 ? `A little gift, just for you — ${n + 1} of ${TOTAL}` : `A little gift, just for you — ${TOTAL} of ${TOTAL} 💗`;
+      $('bar').style.width = Math.min(100, ((n + 1) / (TOTAL + 1)) * 100) + '%';
+    }
+    if (n === 1) startTyping();
+    if (n === 9) { burst(80); }
+    if (n !== 5) pauseAudio();
+    setTimeout(() => locked = false, 500);
+  }, old ? 450 : 0);
+}
+document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => go(current + 1)));
+document.querySelectorAll('[data-yes]').forEach(b => b.addEventListener('click', () => go(9)));
+$('toReveal').addEventListener('click', () => go(2));
+$('replay').addEventListener('click', () => {
+  $('gift').classList.remove('open'); $('gift').classList.add('bounce');
+  $('openGift').disabled = false; $('letter').textContent = ''; $('toReveal').style.display = 'none';
+  resetAudio(); go(0);
+});
+
+// gift opening
+$('openGift').addEventListener('click', e => {
+  e.target.disabled = true;
+  $('gift').classList.remove('bounce'); $('gift').classList.add('open');
+  hearts(25);
+  setTimeout(() => go(1), 1500);
+});
+$('gift').addEventListener('click', () => { if (!$('openGift').disabled) $('openGift').click(); });
+
+// typing animation
+function startTyping(){
+  clearInterval(typer);
+  const el = $('letter'); let i = 0;
+  el.textContent = ''; el.classList.add('caret');
+  $('toReveal').style.display = 'none'; $('skipNote').style.display = 'block';
+  typer = setInterval(() => {
+    i += 2; el.textContent = LETTER_TEXT.slice(0, i);
+    el.scrollTop = el.scrollHeight;
+    if (i >= LETTER_TEXT.length) finishTyping();
+  }, 35);
+}
+function finishTyping(){
+  clearInterval(typer);
+  const el = $('letter');
+  el.textContent = LETTER_TEXT; el.classList.remove('caret');
+  $('toReveal').style.display = 'inline-block'; $('skipNote').style.display = 'none';
+}
+$('letter').addEventListener('click', finishTyping);
+
+// movie celebration
+$('celebrate').addEventListener('click', () => {
+  burst(40); $('movieStop').classList.remove('pop'); void $('movieStop').offsetWidth; $('movieStop').classList.add('pop');
+});
+
+// background floaters
+function floater(list, parent, dur){
+  const s = document.createElement('span');
+  s.className = 'float'; s.textContent = list[Math.floor(Math.random()*list.length)];
+  s.style.left = Math.random()*100 + 'vw';
+  s.style.fontSize = (14 + Math.random()*22) + 'px';
+  s.style.animationDuration = (dur + Math.random()*6) + 's';
+  parent.appendChild(s); setTimeout(() => s.remove(), (dur + 8)*1000);
+}
+function hearts(n){ for (let i=0;i<n;i++) setTimeout(() => floater(['💗','💖','✨','🎀','💕'], $('bg'), 4), i*60); }
+setInterval(() => floater(['💗','✨','🧸','⭐','💕','🎀'], $('bg'), 9), 900);
+
+// confetti
+function burst(n){
+  const box = $('confetti'), items = ['🎉','💗','🧸','✨','🎀','⭐','💖','🐻'];
+  for (let i=0;i<n;i++){
+    const c = document.createElement('span'); c.className = 'conf';
+    c.textContent = items[Math.floor(Math.random()*items.length)];
+    c.style.left = Math.random()*100 + 'vw'; c.style.fontSize = (16 + Math.random()*20) + 'px';
+    c.style.animationDuration = (2 + Math.random()*3) + 's'; c.style.animationDelay = Math.random()*0.8 + 's';
+    box.appendChild(c); setTimeout(() => c.remove(), 6500);
+  }
+}
+
+// audio player
+const audio = $('audio'), playBtn = $('playBtn'), seek = $('seek');
+let audioLoaded = false, audioFailed = false;
+for (let i=0;i<28;i++) $('wave').appendChild(document.createElement('i'));
+function fmt(t){ if (!isFinite(t)) return '0:00'; const m = Math.floor(t/60), s = Math.floor(t%60); return m + ':' + String(s).padStart(2,'0'); }
+function showAudioError(){ audioFailed = true; $('audioMsg').style.display = 'block'; $('player').classList.remove('playing'); playBtn.textContent = '▶'; }
+function pauseAudio(){ if (!audio.paused) audio.pause(); }
+function resetAudio(){ pauseAudio(); if (audioLoaded) audio.currentTime = 0; }
+playBtn.addEventListener('click', () => {
+  if (audioFailed) { showAudioError(); return; }
+  if (!audioLoaded) { audio.src = AUDIO_PATH; audioLoaded = true; }
+  if (audio.paused) audio.play().catch(showAudioError); else audio.pause();
+});
+audio.addEventListener('error', showAudioError);
+audio.addEventListener('play', () => { $('player').classList.add('playing'); playBtn.textContent = '⏸'; });
+audio.addEventListener('pause', () => { $('player').classList.remove('playing'); playBtn.textContent = '▶'; });
+audio.addEventListener('ended', () => { $('player').classList.remove('playing'); playBtn.textContent = '▶'; });
+audio.addEventListener('loadedmetadata', () => { $('dur').textContent = fmt(audio.duration); });
+audio.addEventListener('timeupdate', () => {
+  $('cur').textContent = fmt(audio.currentTime);
+  if (audio.duration) seek.value = (audio.currentTime / audio.duration) * 100;
+});
+seek.addEventListener('input', () => { if (audio.duration) audio.currentTime = (seek.value/100) * audio.duration; });
+$('vol').addEventListener('input', e => audio.volume = e.target.value);
+audio.volume = 0.8;
+
+// start
+go(0);
+</script>
+</body>
+</html>
